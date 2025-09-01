@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI赋能 | 团队名称</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<div class="nav-spacer" aria-hidden="true" style="margin-top: 10px;"></div>
+<body>
+  <div class="bg-grad"></div>
+  <div class="bg-noise"></div>
+
+  <!-- 头部与导航（同 knowledge.html，链接相同） -->
+  <header class="navbar">
+    <div class="nav-left">
+      <button class="icon-btn" id="menuToggle" aria-label="打开菜单" aria-expanded="false">
+        <svg viewBox="0 0 24 24" class="icon"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      </button>
+      <a class="brand" href="index.html">
+        <img src="logo.png" alt="LOGO" class="brand-logo" />
+        团队名称
+      </a>
+      <nav class="nav-links" aria-label="主导航">
+        <a href="index.html" class="nav-link">首页</a>
+        <a href="knowledge.html" class="nav-link">知识共享</a>
+        <a href="ai.html" class="nav-link active">AI赋能</a>
+        <a href="contact.html" class="nav-link">联系我们</a>
+      </nav>
+    </div>
+    <div class="nav-right">
+      <button id="themeToggle" class="icon-btn" aria-label="切换主题">
+        <svg viewBox="0 0 24 24" class="icon theme-sun"><path d="M12 4V2M12 22v-2M4 12H2M22 12h-2M5 5 3.5 3.5M20.5 20.5 19 19M5 19 3.5 20.5M20.5 3.5 19 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        <svg viewBox="0 0 24 24" class="icon theme-moon"><path d="M20 15a8 8 0 1 1-7-11 6 6 0 0 0 7 7 7.8 7.8 0 0 1 0 4z" fill="currentColor"/></svg>
+      </button>
+      <button id="notifyBtn" class="icon-btn" aria-label="通知">
+        <svg viewBox="0 0 24 24" class="icon"><path d="M15 17H9l-1 1H6a2 2 0 0 1-2-2v-1l1-1V9a7 7 0 1 1 14 0v5l1 1v1a2 2 0 0 1-2 2h-2l-1-1zM10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      </button>
+      <div id="authArea" class="auth-area">
+        <button id="openLogin" class="btn primary">登录</button>
+      </div>
+    </div>
+  </header>
+
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <nav class="drawer-links">
+      <a href="index.html" class="drawer-link" style="margin-top: 60px;">首页</a>
+      <a href="knowledge.html" class="drawer-link">知识共享</a>
+      <a href="ai.html" class="drawer-link active">AI赋能</a>
+      <a href="contact.html" class="drawer-link">联系我们</a>
+    </nav>
+  </aside>
+  <div id="drawerBackdrop" class="drawer-backdrop" tabindex="-1" aria-hidden="true"></div>
+
+  <main class="container">
+    <section class="card glass">
+      <h1 style="margin: 10px;">AI 赋能</h1>
+      <!-- <p class="muted">展示 AI 应用案例、在线 Demo、工作流程与接口说明。</p> -->
+      <h1 style="font-size:90px; text-align:center">尚在建设中……</h1>
+      <!-- <div class="grid">
+        <article class="card">
+          <h3>智能问答</h3>
+          <p>基于知识库的问答系统，支持模糊检索与上下文追问。</p>
+          <button class="btn">立即体验</button>
+        </article>
+        <article class="card">
+          <h3>图像处理</h3>
+          <p>OCR/分割/检测/风格化等常见视觉任务的统一接口。</p>
+          <button class="btn">查看接口</button>
+        </article>
+        <article class="card">
+          <h3>自动化脚本</h3>
+          <p>自动整理资料、生成报告、可视化导出。</p>
+          <button class="btn">获取脚本</button>
+        </article>
+      </div>
+    </section> -->
+  </main>
+
+  <!-- 复用登录模态与 Toast -->
+  <div id="loginModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <div class="modal-content glass">
+      <button class="icon-btn modal-close" id="closeLogin" aria-label="关闭">
+        <svg viewBox="0 0 24 24" class="icon"><path d="M6 6l12 12M18 6l-12 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      </button>
+      <h2 id="loginTitle">登录</h2>
+      <p class="muted">请使用分配的账号和密码登录。</p>
+      <form id="loginForm" novalidate>
+        <label class="field"><span>账号</span><input type="text" id="email" placeholder="请输入您的账号" required /><small class="error" id="emailErr"></small></label>
+        <label class="field"><span>密码</span><div class="passwrap"><input type="password" id="password" minlength="1" placeholder="请输入密码" required /><button type="button" id="togglePwd" class="icon-btn" aria-label="切换密码可见"><svg viewBox="0 0 24 24" class="icon"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Zm11 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="currentColor"/></svg></button></div><small class="error" id="pwdErr"></small></label>
+        <label class="check"><input type="checkbox" id="remember" /><span>记住我</span></label>
+        <button class="btn primary full" type="submit">登录</button>
+      </form>
+    </div>
+  </div>
+  <div id="modalBackdrop" class="modal-backdrop" aria-hidden="true"></div>
+
+  <!-- 修改密码模态框 -->
+  <div id="changePasswordModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="changePasswordTitle">
+    <div class="modal-content glass">
+      <button class="icon-btn modal-close" id="closeChangePassword" aria-label="关闭">
+        <svg viewBox="0 0 24 24" class="icon"><path d="M6 6l12 12M18 6l-12 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      </button>
+      <h2 id="changePasswordTitle" style="text-align: center;">修改密码</h2>
+      <p class="muted">请输入当前密码和新密码。</p>
+
+      <form id="changePasswordForm" novalidate>
+        <label class="field">
+          <span>当前密码</span>
+          <div class="passwrap">
+            <input type="password" id="currentPassword" placeholder="请输入当前密码" required />
+            <button type="button" id="toggleCurrentPwd" class="icon-btn" aria-label="切换密码可见">
+              <svg viewBox="0 0 24 24" class="icon"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Zm11 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="currentColor"/></svg>
+            </button>
+          </div>
+          <small class="error" id="currentPwdErr"></small>
+        </label>
+
+        <label class="field">
+          <span>新密码</span>
+          <div class="passwrap">
+            <input type="password" id="newPassword" minlength="6" placeholder="至少 6 位" required />
+            <button type="button" id="toggleNewPwd" class="icon-btn" aria-label="切换密码可见">
+              <svg viewBox="0 0 24 24" class="icon"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Zm11 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="currentColor"/></svg>
+            </button>
+          </div>
+          <small class="error" id="newPwdErr"></small>
+        </label>
+
+        <label class="field">
+          <span>确认新密码</span>
+          <div class="passwrap">
+            <input type="password" id="confirmPassword" placeholder="请再次输入新密码" required />
+            <button type="button" id="toggleConfirmPwd" class="icon-btn" aria-label="切换密码可见">
+              <svg viewBox="0 0 24 24" class="icon"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Zm11 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="currentColor"/></svg>
+            </button>
+          </div>
+          <small class="error" id="confirmPwdErr"></small>
+        </label>
+
+        <button class="btn primary full" type="submit">修改密码</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+  <footer class="site-footer">
+    <small>团队知识共享平台</small>
+  </footer>
+  <!-- 覆盖 API 基础地址，并确保先加载 api-client.js 再加载 app.js -->
+  <script>
+    window.API_BASE_URL = 'http://<公网IP>/api';
+  </script>
+  <script src="api-client.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

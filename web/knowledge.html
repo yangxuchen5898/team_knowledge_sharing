@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>知识共享 | 团队名称</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <style>
+    /* 知识共享模块专用样式 */
+    .documents-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      /* margin-bottom: 1rem; */
+    }
+    
+    .login-prompt {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+    }
+    
+    .document-item {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: var(--card);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .document-item:hover {
+      border-color: var(--primary);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .document-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    
+    .document-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    
+    .document-preview {
+      margin: 0.5rem 0;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+    
+    .editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .editor-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .title-input {
+      width: 100%;
+      font-size: 1.5rem;
+      font-weight: 600;
+      padding: 0.5rem;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    
+    .title-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: var(--card);
+    }
+    
+    .meta-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    
+    .editor-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1rem;
+    }
+    
+    .tab-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    
+    .editor-content {
+      display: flex;
+      height: 70vh;
+      gap: 1rem;
+    }
+    
+    .editor-pane {
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-y: auto;
+      background: var(--card);
+    }
+    
+    .preview-pane {
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-y: auto;
+      background: var(--card);
+    }
+    
+    /* #markdownEditor {
+      width: 100%;
+      height: 100%;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      resize: none;
+      background: var(--card);
+      color: var(--text);
+    } */
+     #markdownEditor {
+      
+
+
+      overflow-y: auto;
+      background: var(--card);
+      width: 100%;
+      height: 100%;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      resize: none;
+      color: var(--text);
+    }
+    
+    #markdownEditor:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      .documents-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+      }
+      
+      .editor-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+      }
+      
+      .editor-content {
+        flex-direction: column;
+        height: auto;
+      }
+      
+      .editor-pane, .preview-pane {
+        min-height: 400px;
+      }
+    }
+    
+    /* 预览样式 */
+    #markdownPreview {
+      line-height: 1.6;
+    }
+    
+    #markdownPreview h1, #markdownPreview h2, #markdownPreview h3 {
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    #markdownPreview h1 { font-size: 1.8rem; }
+    #markdownPreview h2 { font-size: 1.5rem; }
+    #markdownPreview h3 { font-size: 1.3rem; }
+    
+    #markdownPreview p {
+      margin-bottom: 1rem;
+    }
+    
+    #markdownPreview code {
+      background: var(--bg-secondary);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-family: 'Consolas', 'Monaco', monospace;
+    }
+    
+    #markdownPreview pre {
+      background: var(--bg-secondary);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    
+    #markdownPreview blockquote {
+      border-left: 4px solid var(--primary);
+      padding-left: 1rem;
+      margin: 1rem 0;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<div class="nav-spacer" aria-hidden="true" style="margin-top: 10px;"></div>
+<body>
+  <div class="bg-grad"></div>
+  <div class="bg-noise"></div>
+
+  <header class="navbar">
+    <div class="nav-left">
+      <button class="icon-btn" id="menuToggle" aria-label="打开菜单" aria-expanded="false">
+        <svg viewBox="0 0 24 24" class="icon"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      </button>
+      <a class="brand" href="index.html">
+        <img src="logo.png" alt="LOGO" class="brand-logo" />
+        团队名称
+      </a>
+      <nav class="nav-links" aria-label="主导航">
+        <a href="index.html" class="nav-link">首页</a>
+        <a href="knowledge.html" class="nav-link active">知识共享</a>
+        <a href="ai.html" class="nav-link">AI赋能</a>
+        <a href="contact.html" class="nav-link">联系我们</a>
+      </nav>
+    </div>
+    <div class="nav-right">
+      <button id="themeToggle" class="icon-btn" aria-label="切换主题">
+        <svg viewBox="0 0 24 24" class="icon theme-sun"><path d="M12 4V2M12 22v-2M4 12H2M22 12h-2M5 5 3.5 3.5M20.5 20.5 19 19M5 19 3.5 20.5M20.5 3.5 19 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        <svg viewBox="0 0 24 24" class="icon theme-moon"><path d="M20 15a8 8 0 1 1-7-11 6 6 0 0 0 7 7 7.8 7.8 0 0 1 0 4z" fill="currentColor"/></svg>
+      </button>
+      <button id="notifyBtn" class="icon-btn" aria-label="通知">
+        <svg viewBox="0 0 24 24" class="icon"><path d="M15 17H9l-1 1H6a2 2 0 0 1-2-2v-1l1-1V9a7 7 0 1 1 14 0v5l1 1v1a2 2 0 0 1-2 2h-2l-1-1zM10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      </button>
+      <div id="authArea" class="auth-area">
+        <button id="openLogin" class="btn primary">登录</button>
+      </div>
+    </div>
+  </header>
+
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <nav class="drawer-links">
+      <a href="index.html" class="drawer-link" style="margin-top: 60px;">首页</a>
+      <a href="knowledge.html" class="drawer-link active">知识共享</a>
+      <a href="ai.html" class="drawer-link">AI赋能</a>
+      <a href="contact.html" class="drawer-link">联系我们</a>
+    </nav>
+  </aside>
+  <div id="drawerBackdrop" class="drawer-backdrop" tabindex="-1" aria-hidden="true"></div>
+
+  <main class="container">
+    <!-- 文档列表视图 -->
+    <section class="card glass" id="documentsView">
+      <div class="documents-header">
+        <h1 style="margin: 10px;">知识共享</h1>
+        <button id="newDocBtn" class="btn primary" style="display: none; margin: 10px;" onclick="showEditor()">
+          <svg viewBox="0 0 24 24" class="icon" style="width: 16px; height: 16px; margin-right: 8px;">
+            <path d="M12 5v14m-7-7h14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+          新建文档
+        </button>
+      </div>
+      <p class="muted" style="margin: 10px;">分享知识，共同成长。请登录后查看和创建文档。</p>
+      
+      <div id="documentsContainer">
+        <div id="loginPrompt" class="login-prompt">
+          <p>请先登录以查看知识文档</p>
+        </div>
+        <div id="documentsList" style="display: none;">
+          <!-- 文档列表将在这里动态生成 -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 文档编辑器视图 -->
+    <section class="card glass" id="editorView" style="display: none;">
+      <div class="editor-header">
+        <button id="backToList" class="btn secondary" onclick="showDocumentList()">
+          <svg viewBox="0 0 24 24" class="icon" style="width: 16px; height: 16px; margin-right: 8px;">
+            <path d="M19 12H5m7-7-7 7 7 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          返回列表
+        </button>
+        <div class="editor-actions">
+          <button id="saveDoc" class="btn primary" onclick="saveDocument()">保存</button>
+          <button id="deleteDoc" class="btn danger" style="display: none;" onclick="deleteDocument()">删除</button>
+        </div>
+      </div>
+      
+      <div class="document-meta">
+        <input type="text" id="docTitle" placeholder="请输入文档标题..." class="title-input">
+        <div class="meta-info">
+          <span id="authorInfo" style="margin-right: 2px;"></span>
+          <span id="updateTime"></span>
+        </div>
+      </div>
+
+      <div class="editor-container">
+        <div class="editor-tabs">
+          <button class="tab-btn active" data-tab="edit">编辑</button>
+          <button class="tab-btn" data-tab="preview">预览</button>
+          <button class="tab-btn" data-tab="split">分屏</button>
+        </div>
+        
+        <div class="editor-content">
+          <div class="editor-pane" id="editPane">
+            <textarea id="markdownEditor"></textarea>
+          </div>
+          <div class="preview-pane" id="previewPane">
+            <div id="markdownPreview"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="loginModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <div class="modal-content glass">
+      <button class="icon-btn modal-close" id="closeLogin" aria-label="关闭">
+        <svg viewBox="0 0 24 24" class="icon"><path d="M6 6l12 12M18 6l-12 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      </button>
+      <h2 id="loginTitle">登录</h2>
+      <p class="muted">请使用分配的账号和密码登录。</p>
+      <form id="loginForm" novalidate>
+        <label class="field">
+          <span>账号</span>
+          <input type="text" id="email" placeholder="请输入您的账号" required />
+          <small class="error" id="emailErr"></small>
+        </label>
+        <label class="field">
+          <span>密码</span>
+          <div class="passwrap">
+            <input type="password" id="password" minlength="1" placeholder="请输入密码" required />
+            <button type="button" id="togglePwd" class="icon-btn" aria-label="切换密码可见">
+              <svg viewBox="0 0 24 24" class="icon"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Zm11 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="currentColor"/></svg>
+            </button>
+          </div>
+          <small class="error" id="pwdErr"></small>
+        </label>
+        <label class="check"><input type="checkbox" id="remember" /><span>记住我</span></label>
+        <button class="btn primary full" type="submit">登录</button>
+      </form>
+    </div>
+  </div>
+  <div id="modalBackdrop" class="modal-backdrop" aria-hidden="true"></div>
+
+  <!-- 修改密码模态框 -->
+  <div id="changePasswordModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="changePasswordTitle">
+    <div class="modal-content glass">
+      <button class="icon-btn modal-close" id="closeChangePassword" aria-label="关闭">
+        <svg viewBox="0 0 24 24" class="icon"><path d="M6 6l12 12M18 6l-12 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      </button>
+      <h2 id="changePasswordTitle" style="text-align: center;">修改密码</h2>
+      <p class="muted">请输入当前密码和新密码。</p>
+
+      <form id="changePasswordForm" novalidate>
+        <label class="field">
+          <span>当前密码</span>
+          <div class="passwrap">
+            <input type="password" id="currentPassword" placeholder="请输入当前密码" required />
+            <button type="button" id="toggleCurrentPwd" class="icon-btn" aria-label="切换密码可见">
+              <svg viewBox="0 0 24 24" class="icon"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Zm11 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="currentColor"/></svg>
+            </button>
+          </div>
+          <small class="error" id="currentPwdErr"></small>
+        </label>
+
+        <label class="field">
+          <span>新密码</span>
+          <div class="passwrap">
+            <input type="password" id="newPassword" minlength="6" placeholder="至少 6 位" required />
+            <button type="button" id="toggleNewPwd" class="icon-btn" aria-label="切换密码可见">
+              <svg viewBox="0 0 24 24" class="icon"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Zm11 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="currentColor"/></svg>
+            </button>
+          </div>
+          <small class="error" id="newPwdErr"></small>
+        </label>
+
+        <label class="field">
+          <span>确认新密码</span>
+          <div class="passwrap">
+            <input type="password" id="confirmPassword" placeholder="请再次输入新密码" required />
+            <button type="button" id="toggleConfirmPwd" class="icon-btn" aria-label="切换密码可见">
+              <svg viewBox="0 0 24 24" class="icon"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Zm11 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="currentColor"/></svg>
+            </button>
+          </div>
+          <small class="error" id="confirmPwdErr"></small>
+        </label>
+
+        <button class="btn primary full" type="submit">修改密码</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+  <footer class="site-footer">
+    <small>团队知识共享平台</small>
+  </footer>
+  <!-- 覆盖 API 基础地址，并确保先加载 api-client.js 再加载 app.js -->
+  <script>
+    window.API_BASE_URL = 'http://<公网IP>/api';
+  // marked 的配置将放到其库脚本加载之后执行
+    
+    // 创建兼容的apiRequest函数
+    async function apiRequest(endpoint, method = 'GET', data = null) {
+      try {
+        if (method === 'GET') {
+          return await api.get(endpoint);
+        } else if (method === 'POST') {
+          return await api.post(endpoint, data);
+        } else if (method === 'PUT') {
+          return await api.put(endpoint, data);
+        } else if (method === 'DELETE') {
+          return await api.delete(endpoint);
+        }
+      } catch (error) {
+        throw new Error(error.message || '请求失败');
+      }
+    }
+  </script>
+  <!-- 先加载 marked，再进行配置 -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@5.1.1/marked.min.js"></script>
+  <script>
+    if (typeof marked !== 'undefined') {
+      marked.setOptions({ mangle: false, headerIds: false });
+    }
+  </script>
+  <script src="api-client.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script>
+    // 统一规范作者名显示：若是邮箱则去掉 @ 及其后缀
+    function normalizeAuthorName(v) {
+      if (!v) return '未知';
+      const s = String(v).trim();
+      const at = s.indexOf('@');
+      return at > 0 ? s.slice(0, at) : s;
+    }
+    let currentDocument = null;
+    let isEditing = false;
+    
+    // 检查登录状态
+    function checkAuth() {
+      const token = localStorage.getItem('authToken');
+      // 从 app.js 保存的结构读取用户
+      let userRaw = null;
+      try { userRaw = JSON.parse(localStorage.getItem('authUser')); } catch {}
+      const user = userRaw && typeof userRaw === 'object' ? userRaw : { username: userRaw };
+      const isAdmin = user.username === '24zzjk1019' || user.role === 'admin';
+      return { token, username: user.username, userId: user.id, isAdmin };
+    }
+    
+    // 显示/隐藏界面
+    function showDocumentList() {
+      document.getElementById('documentsView').style.display = 'block';
+      document.getElementById('editorView').style.display = 'none';
+      document.getElementById('documentsList').style.display = 'block';
+      isEditing = false;
+    }
+    
+  async function showEditor(doc = null) {
+      document.getElementById('documentsView').style.display = 'none';
+      document.getElementById('editorView').style.display = 'block';
+      isEditing = true;
+      
+      if (doc) {
+        currentDocument = doc;
+        // 如果没有 content，尝试获取详情
+        if (!doc.content && doc._id) {
+          try {
+            const detail = await apiRequest(`/knowledge/documents/${doc._id}`, 'GET').catch(() => null);
+            if (detail && detail.data && detail.data.document) {
+              currentDocument = { ...doc, ...detail.data.document };
+            } else {
+              const alt = await apiRequest(`/documents/${doc._id}`, 'GET').catch(() => null);
+              if (alt && (alt.document || (alt.data && alt.data.document))) {
+                const d = alt.document || alt.data.document;
+                currentDocument = { ...doc, ...d };
+              }
+            }
+          } catch (_) {}
+        }
+
+        let authorName = normalizeAuthorName(
+          typeof currentDocument.author === 'string'
+            ? currentDocument.author
+            : (currentDocument.author && (currentDocument.author.nickname || currentDocument.author.username || currentDocument.author.email)) || '未知'
+        );
+
+        document.getElementById('docTitle').value = currentDocument.title || '';
+        document.getElementById('markdownEditor').value = currentDocument.content || '';
+        document.getElementById('authorInfo').textContent = `作者: ${authorName}`;
+        document.getElementById('updateTime').textContent = `创建时间: ${new Date(currentDocument.createdAt || Date.now()).toLocaleString('zh-CN')}`;
+        
+        // 检查编辑权限
+  const { userId, isAdmin, username } = checkAuth();
+  // 尽量取到作者的id/用户名用于权限
+  const authorId = typeof currentDocument.author === 'object' ? (currentDocument.author._id || currentDocument.author.id) : currentDocument.authorId;
+  authorName = normalizeAuthorName(
+    typeof currentDocument.author === 'string'
+      ? currentDocument.author
+      : (currentDocument.author && (currentDocument.author.username || currentDocument.author.nickname || currentDocument.author.email)) || authorName
+  );
+  const canEditDoc = Boolean(isAdmin || (userId && authorId && String(userId) === String(authorId)) || (username && authorName && username === authorName));
+        document.getElementById('saveDoc').style.display = canEditDoc ? 'inline-block' : 'none';
+        document.getElementById('deleteDoc').style.display = canEditDoc ? 'inline-block' : 'none';
+        document.getElementById('docTitle').readOnly = !canEditDoc;
+        document.getElementById('markdownEditor').readOnly = !canEditDoc;
+        
+        updatePreview();
+      } else {
+        // 新文档
+        currentDocument = null;
+        const { username } = checkAuth();
+        document.getElementById('docTitle').value = '';
+        document.getElementById('markdownEditor').value = '# 新文档\n\n在这里开始编写您的内容...';
+        document.getElementById('authorInfo').textContent = `作者: ${username}`;
+        document.getElementById('updateTime').textContent = `创建时间: ${new Date().toLocaleString('zh-CN')}`;
+        
+        // 新文档总是可编辑
+        document.getElementById('saveDoc').style.display = 'inline-block';
+        document.getElementById('deleteDoc').style.display = 'none';
+        document.getElementById('docTitle').readOnly = false;
+        document.getElementById('markdownEditor').readOnly = false;
+        
+        updatePreview();
+      }
+      
+      // 设置默认的分割视图
+      setTimeout(() => {
+        if (document.getElementById('editorView').style.display !== 'none') {
+          switchTab('split');
+        }
+      }, 100);
+    }
+    
+    // 标签页切换
+    function switchTab(tab) {
+      // 检查编辑器是否可见
+      const editorView = document.getElementById('editorView');
+      if (!editorView || editorView.style.display === 'none') {
+        return; // 如果编辑器不可见，不执行切换
+      }
+      
+  // 移除所有活动状态
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  // 激活当前标签（基于 data-tab）
+  const targetBtn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+      if (targetBtn) {
+        targetBtn.classList.add('active');
+      }
+      
+      const editorPane = document.querySelector('.editor-pane');
+      const previewPane = document.querySelector('.preview-pane');
+      
+      switch(tab) {
+        case 'edit':
+          editorPane.style.display = 'block';
+          previewPane.style.display = 'none';
+          break;
+        case 'preview':
+          editorPane.style.display = 'none';
+          previewPane.style.display = 'block';
+          updatePreview();
+          break;
+        case 'split':
+          editorPane.style.display = 'block';
+          previewPane.style.display = 'block';
+          updatePreview();
+          break;
+      }
+    }
+    
+    // 更新预览
+    function updatePreview() {
+      const content = document.getElementById('markdownEditor').value;
+      const preview = document.getElementById('markdownPreview');
+      
+      try {
+        // 渲染Markdown
+        let html = marked.parse(content);
+        
+        // 处理LaTeX公式
+        html = html.replace(/\$\$(.*?)\$\$/gs, (match, latex) => {
+          try {
+            return katex.renderToString(latex.trim(), { displayMode: true });
+          } catch (e) {
+            return `<div style="color: red; padding: 0.5rem; border: 1px solid red; border-radius: 4px;">LaTeX错误: ${e.message}</div>`;
+          }
+        });
+        
+        html = html.replace(/(?<!\$)\$([^$\n]+?)\$(?!\$)/g, (match, latex) => {
+          try {
+            return katex.renderToString(latex.trim(), { displayMode: false });
+          } catch (e) {
+            return `<span style="color: red;">LaTeX错误: ${e.message}</span>`;
+          }
+        });
+        
+        preview.innerHTML = html;
+      } catch (e) {
+        preview.innerHTML = `<p style="color: red;">渲染错误: ${e.message}</p>`;
+      }
+    }
+    
+    // 加载文档列表
+    async function loadDocuments() {
+      try {
+        // 优先请求服务器已有的旧接口 /knowledge/documents，若失败再尝试简化接口 /documents
+        let response;
+        try {
+          response = await apiRequest('/knowledge/documents', 'GET');
+        } catch (err) {
+          // 回落到新接口
+          response = await apiRequest('/documents', 'GET');
+        }
+
+        const documents = response.documents 
+          || (response.data && response.data.documents) 
+          || [];
+        
+        const listElement = document.getElementById('documentsList');
+        if (documents.length === 0) {
+          listElement.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 2rem;">暂无文档，点击"新建文档"开始创建</p>';
+          return;
+        }
+        
+        listElement.innerHTML = documents.map(doc => {
+          const authorName = normalizeAuthorName(
+            typeof doc.author === 'string'
+              ? doc.author
+              : (doc.author && (doc.author.nickname || doc.author.username || doc.author.email)) || '未知'
+          );
+          const previewText = (doc.content && typeof doc.content === 'string' ? doc.content : (doc.summary || ''));
+          const safePreview = escapeHtml(previewText.substring(0, 100)) + (previewText.length > 100 ? '...' : '');
+          const id = doc._id || doc.id;
+          return `
+            <div class="document-item" data-id="${id}" style="margin: 10px;">
+              <div class="document-title">${escapeHtml(doc.title)}</div>
+              <div class="document-preview">${safePreview}</div>
+              <div class="document-meta">
+                <span>作者: ${escapeHtml(authorName)}</span>
+                <span>${new Date(doc.createdAt).toLocaleDateString('zh-CN')}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+        
+        // 事件委托：点击卡片加载详情并打开编辑器
+        listElement.onclick = async (e) => {
+          const item = e.target.closest('.document-item');
+          if (!item) return;
+          const id = item.getAttribute('data-id');
+          let detail = null;
+          try {
+            detail = await apiRequest(`/knowledge/documents/${id}`, 'GET');
+          } catch (_) {
+            try { detail = await apiRequest(`/documents/${id}`, 'GET'); } catch (__) {}
+          }
+          const doc = detail && (detail.document || (detail.data && detail.data.document));
+          if (doc) {
+            showEditor(doc);
+          }
+        };
+      } catch (error) {
+        console.error('加载文档失败:', error);
+        document.getElementById('documentsList').innerHTML = '<p style="color: var(--error); text-align: center; padding: 2rem;">加载失败，请刷新重试</p>';
+      }
+    }
+    
+    // 保存文档
+    async function saveDocument() {
+      const { username } = checkAuth();
+      if (!username) {
+        alert('请先登录');
+        return;
+      }
+      
+      const title = document.getElementById('docTitle').value.trim();
+      const content = document.getElementById('markdownEditor').value;
+      
+      if (!title) {
+        alert('请输入标题');
+        return;
+      }
+
+      try {
+        const method = currentDocument ? 'PUT' : 'POST';
+        let response;
+        try {
+          // 先走旧接口（服务器更可能已存在）
+          const legacyUrl = currentDocument ? `/knowledge/documents/${currentDocument._id}` : '/knowledge/documents';
+          let moduleId = null;
+          // 仅在创建或需要模块时查询模块
+          if (!currentDocument) {
+            try {
+              const modulesRes = await apiRequest('/knowledge/modules?limit=1', 'GET');
+              const modules = (modulesRes.data && modulesRes.data.modules) || modulesRes.modules || [];
+              if (modules.length) moduleId = modules[0]._id || modules[0].id;
+            } catch (_) {}
+            // 若没有可用模块，尝试创建默认模块
+            if (!moduleId) {
+              try {
+                const createModRes = await apiRequest('/knowledge/modules', 'POST', {
+                  name: '知识共享',
+                  description: '默认模块',
+                  color: '#4f46e5',
+                  icon: 'book'
+                });
+                const created = (createModRes.data && createModRes.data.module) || createModRes.module;
+                if (created) moduleId = created._id || created.id;
+              } catch (_) {
+                // 创建模块失败，稍后回退到新接口
+              }
+            }
+          }
+          const payload = currentDocument
+            ? { title, content, contentType: 'markdown', summary: content.substring(0,150), isPublished: true }
+            : { title, content, contentType: 'markdown', summary: content.substring(0,150), module: moduleId, isPublished: true };
+          if (!currentDocument && !payload.module) {
+            // 仍无模块，抛出以触发回退
+            throw new Error('NO_MODULE');
+          }
+          response = await apiRequest(legacyUrl, method, payload);
+        } catch (legacyErr) {
+          // 回退到新接口（无需模块）
+          const url = currentDocument ? `/documents/${currentDocument._id}` : '/documents';
+          response = await apiRequest(url, method, { title, content });
+        }
+
+        const savedDoc = response.document || (response.data && response.data.document) || response;
+        // 标准化作者字段，便于后续权限判断
+        if (savedDoc && savedDoc.author && typeof savedDoc.author === 'object') {
+          savedDoc.authorId = savedDoc.author._id || savedDoc.author.id;
+        }
+        alert(currentDocument ? '文档更新成功' : '文档创建成功');
+        currentDocument = savedDoc;
+        showDocumentList();
+        loadDocuments();
+      } catch (error) {
+        alert('保存失败: ' + error.message);
+      }
+    }
+    
+    // 删除文档
+    async function deleteDocument() {
+      if (!currentDocument) return;
+      
+      if (!confirm('确定要删除这篇文档吗？此操作不可撤销。')) {
+        return;
+      }
+      
+      try {
+        try {
+          await apiRequest(`/knowledge/documents/${currentDocument._id}`, 'DELETE');
+        } catch (primaryErr) {
+          await apiRequest(`/documents/${currentDocument._id}`, 'DELETE');
+        }
+        alert('文档删除成功');
+        showDocumentList();
+        loadDocuments();
+      } catch (error) {
+        alert('删除失败: ' + error.message);
+      }
+    }
+    
+    // HTML转义
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+    
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', function() {
+      const { token, username } = checkAuth();
+      
+      if (!token || !username) {
+        // 未登录，显示登录提示
+        document.getElementById('loginPrompt').style.display = 'block';
+        document.getElementById('documentsList').style.display = 'none';
+      } else {
+        // 已登录，加载文档列表
+        document.getElementById('loginPrompt').style.display = 'none';
+        document.getElementById('documentsList').style.display = 'block';
+        document.getElementById('newDocBtn').style.display = 'inline-flex';
+        loadDocuments();
+        
+        // 设置实时预览
+        document.getElementById('markdownEditor').addEventListener('input', updatePreview);
+        
+        // 绑定标签按钮点击事件
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+          btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+        
+        // 默认选中分割视图 - 但不立即调用，等待用户打开编辑器时再设置
+        // setTimeout(() => switchTab('split'), 100);
+      }
+    });
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>

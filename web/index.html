@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>团队名称</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<div class="nav-spacer" aria-hidden="true" style="margin-top: 10px;"></div>
+<body>
+  <!-- 全局背景（渐变 + 噪点） -->
+  <div class="bg-grad"></div>
+  <div class="bg-noise"></div>
+
+  <!-- 顶部导航（渐变毛玻璃） -->
+  <header class="navbar">
+    <div class="nav-left">
+      <button class="icon-btn" id="menuToggle" aria-label="打开菜单" aria-expanded="false">
+        <svg viewBox="0 0 24 24" class="icon"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      </button>
+      <a class="brand" href="#">
+        <img src="logo.png" alt="LOGO" class="brand-logo" />
+        团队名称
+      </a>
+        <nav class="nav-links" aria-label="主导航">
+          <a href="index.html" class="nav-link active">首页</a>
+          <a href="knowledge.html" class="nav-link">知识共享</a>
+          <a href="ai.html" class="nav-link">AI赋能</a>
+          <a href="contact.html" class="nav-link">联系我们</a>
+        </nav>
+    </div>
+
+    <div class="nav-right">
+      <button id="themeToggle" class="icon-btn" aria-label="切换主题">
+        <svg viewBox="0 0 24 24" class="icon theme-sun"><path d="M12 4V2M12 22v-2M4 12H2M22 12h-2M5 5 3.5 3.5M20.5 20.5 19 19M5 19 3.5 20.5M20.5 3.5 19 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        <svg viewBox="0 0 24 24" class="icon theme-moon"><path d="M20 15a8 8 0 1 1-7-11 6 6 0 0 0 7 7 7.8 7.8 0 0 1 0 4z" fill="currentColor"/></svg>
+      </button>
+      <button id="notifyBtn" class="icon-btn" aria-label="通知">
+        <svg viewBox="0 0 24 24" class="icon"><path d="M15 17H9l-1 1H6a2 2 0 0 1-2-2v-1l1-1V9a7 7 0 1 1 14 0v5l1 1v1a2 2 0 0 1-2 2h-2l-1-1zM10 20a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      </button>
+      <div id="authArea" class="auth-area">
+        <button id="openLogin" class="btn primary">登录</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 移动端抽屉（渐变毛玻璃） -->
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <nav class="drawer-links">
+      <a href="index.html" class="drawer-link active" style="margin-top: 60px;">首页</a>
+      <a href="knowledge.html" class="drawer-link">知识共享</a>
+      <a href="ai.html" class="drawer-link">AI赋能</a>
+      <a href="contact.html" class="drawer-link">联系我们</a>
+    </nav>
+  </aside>
+  <div id="drawerBackdrop" class="drawer-backdrop" tabindex="-1" aria-hidden="true"></div>
+
+  <!-- 主内容 -->
+  <main class="container">
+    <!-- 轮播图容器 -->
+    <section class="carousel" id="carousel" aria-roledescription="carousel">
+      <div class="carousel-viewport" tabindex="0">
+        <ul class="carousel-track" id="carouselTrack" aria-live="polite">
+          <!-- 脚本将把图片 <li> 注入到这里 -->
+        </ul>
+      </div>
+
+      <!-- 控制按钮 -->
+      <button class="carousel-btn prev" id="prevBtn" aria-label="上一张">&#10094;</button>
+      <button class="carousel-btn next" id="nextBtn" aria-label="下一张">&#10095;</button>
+
+      <!-- 圆点指示器 -->
+      <div class="carousel-dots" id="carouselDots" role="tablist" aria-label="轮播图页码">
+        <!-- 脚本生成圆点 -->
+      </div>
+    </section>
+    <!-- Hero 卡（渐变毛玻璃） -->
+    <section class="hero card glass">
+
+      <div class="hero-text">
+        <h1>班级简介</h1>
+        
+        <p>
+          计算机科学与技术专业本科24级一班共28人，其中男生21人、女生7人，以“班承星海，智创未来”为口号，凝练了班级同学志向远大如星辰般璀璨、如海洋般包容的精神风貌与面向未来的探索发展目标。目前班级中设有班长、团支书、学习委员、文体委员、心理委员和宣传委员6个班委职务，班级内班委分工明确，为同学们的学习生活提供有力支持，推动班级各项工作的有序进行。
+        </p>
+        <p>
+          我们致力于打造一个以知识共享为核心、以AI赋能为驱动的创新型平台。
+        </p>
+      </div>
+
+    </section>
+
+    <section class="grid">
+      <article class="card glass">
+        <h2>班级建设风采</h2>
+        <p>
+          班级以“班承星海，智创未来”为引领，在学业、实践与公益领域全面彰显青年担当。
+        </p>
+        <p>
+          学业建设方面，通过线上线下结合的互助学习模式有效提升整体竞争力，秋冬季保持4人稳居3.5-4.0高分段，展现发展韧性。
+        </p>
+        <p>
+          学生创新意识活跃，作为大一年级学生已有4人申报校级大创项目，聚焦前沿方向展开学科交叉实践，构建“以赛促学”创新发展体系。
+        </p>
+        <p>
+          社会责任建设成效显著，班级累计完成357小时志愿服务，形成“智慧支教”“校内实践”“助老帮扶”三大特色板块，运用专业知识服务小学生与社区老人，实现技能普惠与社会价值双赢。
+        </p>
+        <p>
+          职业发展布局前瞻，通过职业规划大赛系统建构人工智能工程师等发展路径，形成“技术+行业”双核能力培养范式。
+        </p>
+        <p>
+          信息素养持续强化，10名同学参与信息检索大赛，锤炼数字时代核心竞争力。班级成员在专业精进、科研探索与服务实践中赓续星海精神，智创成长新局。
+        </p>
+      </article>
+      <article class="card glass">
+        <h2>班级特色活动</h2>
+        <p>
+          班级以多元活动凝铸集体精神，践行科技报国理想。
+        </p>
+        <p>
+          初入学院时，由于同学们存在人际交往壁垒、专业认知模糊和科技使命感尚未建立的问题，班级通过自我介绍和“你画我猜”游戏实现同学间破圈交流；组织ACM创新实验室、网络空间安全实验室、高性能计算中心沉浸式体验学院各类实验室参观；参观钱伟长博物馆，打造“科学家精神必修课”，同学们初步构建起“将个人能力融入国家信息产业发展”的职业愿景。
+        </p>
+        <p>
+          在日常与同学的交流互动中，班长与团支书发现部分同学存在红色历史认知碎片化、爱国情怀缺乏实践载体的问题，结合“赓续红色血脉”的主题以“时空对话”为轴线策划主题团日。同学们从“一二·九”运动历史回溯到黄宏嘉院士的光纤报国实践，以红色场馆实地考察解锁时空密码，以明信片书写架起历史与当下的精神对话。
+        </p>
+        <p>
+          随着初冬的帷幕缓缓拉开，为凝聚班级，秉持“健康第一，终身受益”的原则，班级开展“拒宅·聚彩” 班级体育主题活动。活动中，蒙眼互打考验信任，珠行千里锤炼协作，拔河赛场凝聚众志，同学们在汗水中领悟“荣光共享、挫折共担”的团队真谛。
+        </p>
+        <p>
+          从实验室到红色讲堂，从博物馆到运动场，班级以知践融合的姿态，持续书写着“以代码为剑，以信仰为盾”的青春篇章。
+        </p>
+      </article>
+      
+    </section>
+  </main>
+
+  <!-- 登录模态（渐变毛玻璃） -->
+  <div id="loginModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <div class="modal-content glass">
+      <button class="icon-btn modal-close" id="closeLogin" aria-label="关闭">
+        <svg viewBox="0 0 24 24" class="icon"><path d="M6 6l12 12M18 6l-12 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      </button>
+      <h2 id="loginTitle" style="text-align: center;">登录</h2>
+      <p class="muted">请使用分配的账号和密码登录。</p>
+
+      <form id="loginForm" novalidate>
+        <label class="field">
+          <span>账号</span>
+          <input type="text" id="email" placeholder="请输入您的账号" required />
+          <small class="error" id="emailErr"></small>
+        </label>
+
+        <label class="field">
+          <span>密码</span>
+          <div class="passwrap">
+            <input type="password" id="password" minlength="1" placeholder="请输入密码" required />
+            <button type="button" id="togglePwd" class="icon-btn" aria-label="切换密码可见">
+              <svg viewBox="0 0 24 24" class="icon"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Zm11 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="currentColor"/></svg>
+            </button>
+          </div>
+          <small class="error" id="pwdErr"></small>
+        </label>
+
+        <label class="check">
+          <input type="checkbox" id="remember" />
+          <span>记住我</span>
+        </label>
+
+        <button class="btn primary full" type="submit">登录</button>
+      </form>
+    </div>
+  </div>
+  <div id="modalBackdrop" class="modal-backdrop" aria-hidden="true"></div>
+
+  <!-- 修改密码模态框 -->
+  <div id="changePasswordModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="changePasswordTitle">
+    <div class="modal-content glass">
+      <button class="icon-btn modal-close" id="closeChangePassword" aria-label="关闭">
+        <svg viewBox="0 0 24 24" class="icon"><path d="M6 6l12 12M18 6l-12 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      </button>
+      <h2 id="changePasswordTitle" style="text-align: center;">修改密码</h2>
+      <p class="muted">请输入当前密码和新密码。</p>
+
+      <form id="changePasswordForm" novalidate>
+        <label class="field">
+          <span>当前密码</span>
+          <div class="passwrap">
+            <input type="password" id="currentPassword" placeholder="请输入当前密码" required />
+            <button type="button" id="toggleCurrentPwd" class="icon-btn" aria-label="切换密码可见">
+              <svg viewBox="0 0 24 24" class="icon"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Zm11 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="currentColor"/></svg>
+            </button>
+          </div>
+          <small class="error" id="currentPwdErr"></small>
+        </label>
+
+        <label class="field">
+          <span>新密码</span>
+          <div class="passwrap">
+            <input type="password" id="newPassword" minlength="6" placeholder="至少 6 位" required />
+            <button type="button" id="toggleNewPwd" class="icon-btn" aria-label="切换密码可见">
+              <svg viewBox="0 0 24 24" class="icon"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Zm11 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="currentColor"/></svg>
+            </button>
+          </div>
+          <small class="error" id="newPwdErr"></small>
+        </label>
+
+        <label class="field">
+          <span>确认新密码</span>
+          <div class="passwrap">
+            <input type="password" id="confirmPassword" placeholder="请再次输入新密码" required />
+            <button type="button" id="toggleConfirmPwd" class="icon-btn" aria-label="切换密码可见">
+              <svg viewBox="0 0 24 24" class="icon"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Zm11 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="currentColor"/></svg>
+            </button>
+          </div>
+          <small class="error" id="confirmPwdErr"></small>
+        </label>
+
+        <button class="btn primary full" type="submit">修改密码</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast 容器 -->
+  <div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+  <footer class="site-footer">
+    <small>团队知识共享平台</small>
+  </footer>
+  <!-- 覆盖 API 基础地址：固定为公网IP，避免浏览器指向 localhost -->
+  <script>
+    window.API_BASE_URL = 'http://<公网IP>/api';
+  </script>
+  <script src="api-client.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

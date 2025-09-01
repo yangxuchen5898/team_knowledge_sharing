@@ -1,0 +1,467 @@
+const express = require('express');
+const Contact = require('../models/Contact');
+const { validateContact, validateObjectId, validatePagination } = require('../middleware/validation');
+const { requireAdmin } = require('../middleware/auth');
+
+const router = express.Router();
+
+// 提交联系表单
+router.post('/', validateContact, async (req, res) => {
+  try {
+    const { name, email, subject, message } = req.body;
+
+    // 获取IP地址和User-Agent
+    const ipAddress = req.ip || req.connection.remoteAddress || req.socket.remoteAddress || '';
+    const userAgent = req.get('User-Agent') || '';
+
+    // 简单的垃圾邮件检�?
+    const spamKeywords = ['spam', 'casino', 'viagra', 'lottery', 'winner'];
+    const isSpam = spamKeywords.some(keyword => 
+      message.toLowerCase().includes(keyword) || 
+      subject.toLowerCase().includes(keyword)
+    );
+
+    const contact = new Contact({
+      name,
+      email,
+      subject,
+      message,
+      ipAddress,
+      userAgent,
+      isSpam
+    });
+
+    await contact.save();
+
+    res.status(201).json({
+      success: true,
+      message: '留言提交成功，我们会尽快回复',
+      data: {
+        contact: {
+          _id: contact._id,
+          name: contact.name,
+          email: contact.email,
+          subject: contact.subject,
+          status: contact.status,
+          createdAt: contact.createdAt
+        }
+      }
+    });
+  } catch (error) {
+    console.error('提交联系表单错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '提交失败，请稍后重试'
+    });
+  }
+});
+
+// 获取联系表单列表（管理员�?
+router.get('/', requireAdmin, validatePagination, async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    let query = {};
+
+    // 状态筛�?
+    if (req.query.status) {
+      query.status = req.query.status;
+    }
+
+    // 优先级筛�?
+    if (req.query.priority) {
+      query.priority = req.query.priority;
+    }
+
+    // 垃圾邮件筛�?
+    if (req.query.spam === 'true') {
+      query.isSpam = true;
+    } else if (req.query.spam === 'false') {
+      query.isSpam = false;
+    }
+
+    // 搜索条件
+    if (req.query.search) {
+      const searchRegex = new RegExp(req.query.search, 'i');
+      query.$or = [
+        { name: searchRegex },
+        { email: searchRegex },
+        { subject: searchRegex },
+        { message: searchRegex }
+      ];
+    }
+
+    // 日期范围筛�?
+    if (req.query.startDate && req.query.endDate) {
+      query.createdAt = {
+        $gte: new Date(req.query.startDate),
+        $lte: new Date(req.query.endDate)
+      };
+    }
+
+    // 排序
+    let sort = { createdAt: -1 };
+    if (req.query.sort === 'priority') {
+      sort = { priority: 1, createdAt: -1 };
+    } else if (req.query.sort === 'status') {
+      sort = { status: 1, createdAt: -1 };
+    }
+
+    const [contacts, total] = await Promise.all([
+      Contact.find(query)
+        .populate('reply.repliedBy', 'nickname email')
+        .populate('notes.createdBy', 'nickname email')
+        .sort(sort)
+        .skip(skip)
+        .limit(limit),
+      Contact.countDocuments(query)
+    ]);
+
+    // 统计信息
+    const stats = await Contact.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const statusStats = {};
+    stats.forEach(stat => {
+      statusStats[stat._id] = stat.count;
+    });
+
+    res.json({
+      success: true,
+      data: {
+        contacts,
+        pagination: {
+          page,
+          limit,
+          total,
+          pages: Math.ceil(total / limit)
+        },
+        stats: statusStats
+      }
+    });
+  } catch (error) {
+    console.error('获取联系表单列表错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取联系表单列表失败'
+    });
+  }
+});
+
+// 获取指定联系表单详情（管理员�?
+router.get('/:contactId', requireAdmin, validateObjectId('contactId'), async (req, res) => {
+  try {
+    const contact = await Contact.findById(req.params.contactId)
+      .populate('reply.repliedBy', 'nickname email avatar')
+      .populate('notes.createdBy', 'nickname email avatar');
+
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        error: '联系表单不存�?
+      });
+    }
+
+    // 标记为已�?
+    if (contact.status === 'pending') {
+      await contact.markAsRead();
+    }
+
+    res.json({
+      success: true,
+      data: { contact }
+    });
+  } catch (error) {
+    console.error('获取联系表单详情错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '获取联系表单详情失败'
+    });
+  }
+});
+
+// 回复联系表单（管理员�?
+router.post('/:contactId/reply', requireAdmin, validateObjectId('contactId'), [
+  require('express-validator').body('content')
+    .trim()
+    .isLength({ min: 1, max: 2000 })
+    .withMessage('回复内容长度�?-2000个字符之�?),
+  require('../middleware/validation').handleValidationErrors
+], async (req, res) => {
+  try {
+    const { content } = req.body;
+    const contactId = req.params.contactId;
+
+    const contact = await Contact.findById(contactId);
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        error: '联系表单不存�?
+      });
+    }
+
+    await contact.addReply(content, req.user._id);
+    await contact.populate('reply.repliedBy', 'nickname email avatar');
+
+    res.json({
+      success: true,
+      message: '回复成功',
+      data: { contact }
+    });
+  } catch (error) {
+    console.error('回复联系表单错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '回复失败'
+    });
+  }
+});
+
+// 添加备注（管理员�?
+router.post('/:contactId/notes', requireAdmin, validateObjectId('contactId'), [
+  require('express-validator').body('content')
+    .trim()
+    .isLength({ min: 1, max: 500 })
+    .withMessage('备注内容长度�?-500个字符之�?),
+  require('../middleware/validation').handleValidationErrors
+], async (req, res) => {
+  try {
+    const { content } = req.body;
+    const contactId = req.params.contactId;
+
+    const contact = await Contact.findById(contactId);
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        error: '联系表单不存�?
+      });
+    }
+
+    await contact.addNote(content, req.user._id);
+    await contact.populate('notes.createdBy', 'nickname email avatar');
+
+    res.json({
+      success: true,
+      message: '备注添加成功',
+      data: { contact }
+    });
+  } catch (error) {
+    console.error('添加备注错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '添加备注失败'
+    });
+  }
+});
+
+// 更新联系表单状态（管理员）
+router.patch('/:contactId/status', requireAdmin, validateObjectId('contactId'), [
+  require('express-validator').body('status')
+    .isIn(['pending', 'read', 'replied', 'closed'])
+    .withMessage('状态必须是 pending, read, replied, closed 中的一�?),
+  require('../middleware/validation').handleValidationErrors
+], async (req, res) => {
+  try {
+    const { status } = req.body;
+    const contactId = req.params.contactId;
+
+    const contact = await Contact.findByIdAndUpdate(
+      contactId,
+      { status },
+      { new: true, runValidators: true }
+    ).populate('reply.repliedBy', 'nickname email avatar');
+
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        error: '联系表单不存�?
+      });
+    }
+
+    res.json({
+      success: true,
+      message: '状态更新成�?,
+      data: { contact }
+    });
+  } catch (error) {
+    console.error('更新状态错�?', error);
+    res.status(500).json({
+      success: false,
+      error: '更新状态失�?
+    });
+  }
+});
+
+// 更新优先级（管理员）
+router.patch('/:contactId/priority', requireAdmin, validateObjectId('contactId'), [
+  require('express-validator').body('priority')
+    .isIn(['low', 'normal', 'high', 'urgent'])
+    .withMessage('优先级必须是 low, normal, high, urgent 中的一�?),
+  require('../middleware/validation').handleValidationErrors
+], async (req, res) => {
+  try {
+    const { priority } = req.body;
+    const contactId = req.params.contactId;
+
+    const contact = await Contact.findByIdAndUpdate(
+      contactId,
+      { priority },
+      { new: true, runValidators: true }
+    );
+
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        error: '联系表单不存�?
+      });
+    }
+
+    res.json({
+      success: true,
+      message: '优先级更新成�?,
+      data: { contact }
+    });
+  } catch (error) {
+    console.error('更新优先级错�?', error);
+    res.status(500).json({
+      success: false,
+      error: '更新优先级失�?
+    });
+  }
+});
+
+// 标记为垃圾邮件（管理员）
+router.patch('/:contactId/spam', requireAdmin, validateObjectId('contactId'), [
+  require('express-validator').body('isSpam')
+    .isBoolean()
+    .withMessage('isSpam 必须是布尔�?),
+  require('../middleware/validation').handleValidationErrors
+], async (req, res) => {
+  try {
+    const { isSpam } = req.body;
+    const contactId = req.params.contactId;
+
+    const contact = await Contact.findByIdAndUpdate(
+      contactId,
+      { isSpam },
+      { new: true, runValidators: true }
+    );
+
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        error: '联系表单不存�?
+      });
+    }
+
+    res.json({
+      success: true,
+      message: isSpam ? '已标记为垃圾邮件' : '已取消垃圾邮件标�?,
+      data: { contact }
+    });
+  } catch (error) {
+    console.error('更新垃圾邮件状态错�?', error);
+    res.status(500).json({
+      success: false,
+      error: '更新垃圾邮件状态失�?
+    });
+  }
+});
+
+// 删除联系表单（管理员�?
+router.delete('/:contactId', requireAdmin, validateObjectId('contactId'), async (req, res) => {
+  try {
+    const contact = await Contact.findByIdAndDelete(req.params.contactId);
+
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        error: '联系表单不存�?
+      });
+    }
+
+    res.json({
+      success: true,
+      message: '联系表单删除成功'
+    });
+  } catch (error) {
+    console.error('删除联系表单错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '删除联系表单失败'
+    });
+  }
+});
+
+// 批量操作（管理员�?
+router.post('/batch', requireAdmin, [
+  require('express-validator').body('action')
+    .isIn(['delete', 'markAsRead', 'markAsSpam', 'updateStatus'])
+    .withMessage('操作必须�?delete, markAsRead, markAsSpam, updateStatus 中的一�?),
+  require('express-validator').body('contactIds')
+    .isArray({ min: 1 })
+    .withMessage('contactIds 必须是非空数�?),
+  require('express-validator').body('contactIds.*')
+    .isMongoId()
+    .withMessage('每个 contactId 必须是有效的MongoDB ID'),
+  require('../middleware/validation').handleValidationErrors
+], async (req, res) => {
+  try {
+    const { action, contactIds, status } = req.body;
+
+    let result;
+    switch (action) {
+      case 'delete':
+        result = await Contact.deleteMany({ _id: { $in: contactIds } });
+        break;
+      case 'markAsRead':
+        result = await Contact.updateMany(
+          { _id: { $in: contactIds } },
+          { status: 'read' }
+        );
+        break;
+      case 'markAsSpam':
+        result = await Contact.updateMany(
+          { _id: { $in: contactIds } },
+          { isSpam: true }
+        );
+        break;
+      case 'updateStatus':
+        if (!status || !['pending', 'read', 'replied', 'closed'].includes(status)) {
+          return res.status(400).json({
+            success: false,
+            error: '更新状态时必须提供有效的状态�?
+          });
+        }
+        result = await Contact.updateMany(
+          { _id: { $in: contactIds } },
+          { status }
+        );
+        break;
+    }
+
+    res.json({
+      success: true,
+      message: `批量操作成功，影响了 ${result.modifiedCount || result.deletedCount} 条记录`,
+      data: { 
+        affected: result.modifiedCount || result.deletedCount 
+      }
+    });
+  } catch (error) {
+    console.error('批量操作错误:', error);
+    res.status(500).json({
+      success: false,
+      error: '批量操作失败'
+    });
+  }
+});
+
+module.exports = router;

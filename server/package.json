@@ -1,0 +1,40 @@
+{
+  "name": "bug-platform-backend",
+  "version": "1.0.0",
+  "description": "知识共享平台后端API - 企业级后端系统，支持用户认证、知识管理、联系功能。针对CentOS 8.5优化部署。",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "create-admin": "node utils/createAdmin.js",
+  "list-contacts": "node utils/listContacts.js",
+    "test": "node test-api.js"
+  },
+  "keywords": [
+    "knowledge-sharing",
+    "blog",
+    "education"
+  ],
+  "author": "BUG终结智创营",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "csv-parser": "^3.2.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.7.0",
+    "express-validator": "^6.15.0",
+    "helmet": "^6.0.1",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.0.0",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
+  "engines": {
+    "node": ">=18.17.0",
+    "npm": ">=9.0.0"
+  }
+}
